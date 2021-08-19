@@ -1,8 +1,15 @@
 console.log("Hello");
 
 let textArea = document.getElementById("inputArea");
-textArea.addEventListener("input", function () {
+textArea.addEventListener("input", listener);
+
+function listener() {
     let text = textArea.value;
+    if (text == "") {
+        // if there is nothing in text area
+        document.getElementById("suggestion").innerHTML = "";
+        return;
+    }
     let xhr = new XMLHttpRequest();
     xhr.open("GET", `https://suggestqueries.google.com/complete/search?output=toolbar&hl=en&q=${text}`, true);
     xhr.send();
@@ -10,27 +17,35 @@ textArea.addEventListener("input", function () {
         if (this.status == 200) {
             // console.log(this.responseText);
             let xml = this.responseText;
-            let XmlNode=new DOMParser().parseFromString(xml, 'text/xml');
-            let res=xmlToJson(XmlNode);
+            let XmlNode = new DOMParser().parseFromString(xml, 'text/xml');
+            let res = xmlToJson(XmlNode);
 
             let obj = res.toplevel.CompleteSuggestion;
-            console.log(obj);
+            // console.log(obj);
             let html = "";
-            obj.forEach(result => {
+            obj.forEach((result, index) => {
                 html += `
-                    <li class="list-group-item">${result.suggestion["@attributes"].data}</li>
-                `;
-                // console.log(result.suggestion["@attributes"].data);
+                        <li class="list-group-item" id="${index}" onclick="clicker(${index})">${result.suggestion["@attributes"].data}</li>
+                    `;
             });
             document.getElementById("suggestion").innerHTML = html;
-
-
         }
         else {
+            document.getElementById("suggestion").innerHTML = "";
             console.log("some error occured");
         }
     }
-})
+}
+
+
+// when a suggestion is clicked this will run
+function clicker(index) {
+    let text = document.getElementById(`${index}`).innerText;
+    textArea.value = text;
+    listener();
+}
+
+
 
 function xmlToJson(xml) {
     // Create the return object
