@@ -15,7 +15,6 @@ function listener() {
     xhr.send();
     xhr.onload = function () {
         if (this.status == 200) {
-            // console.log(this.responseText);
             let xml = this.responseText;
             let XmlNode = new DOMParser().parseFromString(xml, 'text/xml');
             let res = xmlToJson(XmlNode);
@@ -25,7 +24,7 @@ function listener() {
             let html = "";
             obj.forEach((result, index) => {
                 html += `
-                        <li class="list-group-item" id="${index}" onclick="clicker(${index})">${result.suggestion["@attributes"].data}</li>
+                        <button type="button" class="list-group-item list-group-item-action" id="${index}" onclick="clicker(${index})">${result.suggestion["@attributes"].data}</button>
                     `;
             });
             document.getElementById("suggestion").innerHTML = html;
@@ -47,6 +46,7 @@ function clicker(index) {
 
 
 
+// converts a xml string to json Object
 function xmlToJson(xml) {
     // Create the return object
     var obj = {};
